@@ -1,0 +1,12 @@
+[submodule "libs/JUCE"]
+	path = libs/JUCE
+	url = https://github.com/surge-synthesizer/JUCE
+[submodule "libs/sst/sst-effects"]
+	path = libs/sst/sst-effects
+	url = https://github.com/surge-synthesizer/sst-effects
+[submodule "libs/sst/sst-basic-blocks"]
+	path = libs/sst/sst-basic-blocks
+	url = https://github.com/surge-synthesizer/sst-basic-blocks
+[submodule "libs/sst/sst-filters"]
+	path = libs/sst/sst-filters
+	url = https://github.com/surge-synthesizer/sst-filters

@@ -1,0 +1,40 @@
+From 67134e32bcc07e6f86aa5703f5e4d87621c1cc1a Mon Sep 17 00:00:00 2001
+From: Bill Allen <pb@ballen.fastmail.fm>
+Date: Tue, 26 May 2026 12:22:34 -0400
+Subject: [PATCH] Add units:unit annotation to LV2 TTL parameter output
+
+Maps JUCE parameter labels (%, Hz, ms, dB) to LV2 unit URIs
+(units:pc, units:hz, units:ms, units:db) in the generated .ttl files.
+Required for MODEP/patchstorage to display correct parameter units.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+---
+ .../juce_audio_plugin_client_LV2.cpp                 | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.cpp b/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.cpp
+index 8cb4d331a9..b09816f46e 100644
+--- a/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.cpp
++++ b/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.cpp
+@@ -1100,6 +1100,18 @@ private:
+                 }
+             }
+ 
++            // Emit units:unit annotation when the parameter label matches a known LV2 unit
++            {
++                const auto label = param.getLabel();
++                const char* unitStr = nullptr;
++                if      (label == "%")  unitStr = "units:pc";
++                else if (label == "Hz") unitStr = "units:hz";
++                else if (label == "ms") unitStr = "units:ms";
++                else if (label == "dB") unitStr = "units:db";
++                if (unitStr != nullptr)
++                    os << " ;\n\tunits:unit " << unitStr;
++            }
++
+             os << " .\n\n";
+         };
+ 
+-- 
+2.39.5
+
