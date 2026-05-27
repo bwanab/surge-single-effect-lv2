@@ -1,0 +1,45 @@
+<div class="pedal surge-effect">
+    <div class="pedal-header">
+        <h1>{{label}}</h1>
+        <span class="brand">Surge XT</span>
+    </div>
+
+    <div class="pedal-controls">
+        <!-- Knobs are bound to ports by data-port-symbol attribute -->
+        <!-- Symbol names must match the LV2 port symbols in the TTL -->
+
+        <div class="knob-group">
+            <div class="knob" data-port-symbol="PARAM1_SYMBOL">
+                <span class="knob-name">Param 1</span>
+            </div>
+            <div class="knob" data-port-symbol="PARAM2_SYMBOL">
+                <span class="knob-name">Param 2</span>
+            </div>
+        </div>
+
+        <div class="knob-group">
+            <div class="knob" data-port-symbol="PARAM3_SYMBOL">
+                <span class="knob-name">Param 3</span>
+            </div>
+            <div class="knob" data-port-symbol="PARAM4_SYMBOL">
+                <span class="knob-name">Param 4</span>
+            </div>
+        </div>
+
+        <!-- For select/enum parameters use a select element -->
+        <!--
+        <div class="select-group">
+            <select data-port-symbol="MODE_SYMBOL">
+                <option value="0">Mode A</option>
+                <option value="1">Mode B</option>
+            </select>
+            <span class="select-name">Mode</span>
+        </div>
+        -->
+    </div>
+
+    <div class="pedal-footer">
+        <div class="bypass-switch" data-port-symbol=":bypass"></div>
+        <div class="pedal-led"></div>
+    </div>
+</div>
