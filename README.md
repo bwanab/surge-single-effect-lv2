@@ -44,7 +44,8 @@ updated to versions compatible with both macOS 15 and the Surge project:
 ```sh
 sudo apt install cmake ninja-build build-essential pkg-config \
                  libasound2-dev libfreetype6-dev libx11-dev libxrandr-dev \
-                 libxinerama-dev libxcursor-dev libgl1-mesa-dev lv2-dev
+                 libxinerama-dev libxcursor-dev libgl1-mesa-dev lv2-dev \
+                 libcurl4-openssl-dev libwebkit2gtk-4.1-dev
 ```
 
 ### macOS → Linux cross-build via Docker (M1/Apple Silicon)
@@ -53,21 +54,22 @@ On Apple Silicon the Docker Linux aarch64 container runs at native speed and pro
 exact MODEP-ready binaries:
 
 ```sh
-# One-time: pull a builder image
-docker pull ghcr.io/surge-synthesizer/surge-build-environment:latest  # or use ubuntu:24.04
-
-# Build inside container (mount the repo)
 docker run --rm -v $(pwd):/work -w /work ubuntu:24.04 bash -c "
   apt-get update -q && \
-  apt-get install -y cmake ninja-build build-essential pkg-config \
+  apt-get install -y cmake ninja-build build-essential pkg-config git \
     libasound2-dev libfreetype6-dev libx11-dev libxrandr-dev \
-    libxinerama-dev libxcursor-dev libgl1-mesa-dev lv2-dev && \
+    libxinerama-dev libxcursor-dev libgl1-mesa-dev lv2-dev \
+    libcurl4-openssl-dev libwebkit2gtk-4.1-dev && \
+  git config --global --add safe.directory /work && \
+  git submodule update --init --recursive && \
   cmake -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release && \
-  cmake --build build-linux
+  cmake --build build-linux -- -j 2
 "
 ```
 
-The LV2 bundles will be in `build-linux/src/surge-fx-<name>_artefacts/`.
+The `-j 2` limits parallelism to avoid running out of memory in Docker.
+
+The LV2 bundles will be in `build-linux/src/surge-fx-<name>_artefacts/Release/LV2/`.
 
 ---
 
