@@ -1,0 +1,73 @@
+@prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
+@prefix modgui: <http://moddevices.com/ns/modgui#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://surge-synthesizer.github.io/plugins/surge-xt-flanger>
+    modgui:gui [
+        modgui:resourcesDirectory <modgui> ;
+        modgui:iconTemplate <modgui/icon.html> ;
+        modgui:stylesheet <modgui/stylesheet.css> ;
+        modgui:screenshot <modgui/screenshot.png> ;
+        modgui:thumbnail <modgui/thumbnail.png> ;
+        modgui:brand "Surge Synth Team" ;
+        modgui:label "Flanger" ;
+        modgui:model "boxy" ;
+        modgui:panel [
+            modgui:color "#2D5D7B" ;
+        ] ;
+        modgui:port [
+            lv2:index 0 ;
+            lv2:symbol "Mode" ;
+            lv2:name "Mode" ;
+        ] ;
+        modgui:port [
+            lv2:index 1 ;
+            lv2:symbol "Waveform" ;
+            lv2:name "Waveform" ;
+        ] ;
+        modgui:port [
+            lv2:index 2 ;
+            lv2:symbol "Rate" ;
+            lv2:name "Rate" ;
+        ] ;
+        modgui:port [
+            lv2:index 3 ;
+            lv2:symbol "Depth" ;
+            lv2:name "Depth" ;
+        ] ;
+        modgui:port [
+            lv2:index 4 ;
+            lv2:symbol "Count" ;
+            lv2:name "Count" ;
+        ] ;
+        modgui:port [
+            lv2:index 5 ;
+            lv2:symbol "Base_20Pitch" ;
+            lv2:name "Base Pitch" ;
+        ] ;
+        modgui:port [
+            lv2:index 6 ;
+            lv2:symbol "Spacing" ;
+            lv2:name "Spacing" ;
+        ] ;
+        modgui:port [
+            lv2:index 7 ;
+            lv2:symbol "Feedback" ;
+            lv2:name "Feedback" ;
+        ] ;
+        modgui:port [
+            lv2:index 8 ;
+            lv2:symbol "HF_20Damping" ;
+            lv2:name "HF Damping" ;
+        ] ;
+        modgui:port [
+            lv2:index 9 ;
+            lv2:symbol "Width" ;
+            lv2:name "Width" ;
+        ] ;
+        modgui:port [
+            lv2:index 10 ;
+            lv2:symbol "Mix" ;
+            lv2:name "Mix" ;
+        ] ;
+    ] .

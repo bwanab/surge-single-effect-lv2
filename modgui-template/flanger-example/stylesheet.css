@@ -1,0 +1,183 @@
+/* Surge XT Flanger Pedal Stylesheet */
+
+.surge-flanger {
+    width: 240px;
+    height: 360px;
+    background: linear-gradient(135deg, #1a3a4a 0%, #2d5d7b 50%, #1a3a4a 100%);
+    border-radius: 12px;
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    position: relative;
+}
+
+.pedal-header {
+    text-align: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+}
+
+.pedal-header h1 {
+    color: #ff9800;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 4px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.pedal-header .brand {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pedal-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Select dropdowns row */
+.select-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+.select-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.select-group select {
+    background: linear-gradient(180deg, #444, #222);
+    color: #ff9800;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    min-width: 80px;
+    cursor: pointer;
+}
+
+.select-group select:focus {
+    outline: none;
+    border-color: #ff9800;
+}
+
+.select-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 8px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Knob rows */
+.knob-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.knob-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.knob {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at 30% 30%, #555, #222);
+    border-radius: 50%;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.4),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    position: relative;
+    cursor: pointer;
+}
+
+.knob::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 18px;
+    background: #ff9800;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(255, 152, 0, 0.5);
+}
+
+.knob.large {
+    width: 60px;
+    height: 60px;
+}
+
+.knob.large::after {
+    height: 22px;
+    top: 8px;
+}
+
+.knob-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 9px;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Footer with bypass */
+.pedal-footer {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.bypass-switch {
+    width: 50px;
+    height: 22px;
+    background: linear-gradient(180deg, #666, #333);
+    border-radius: 4px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
+.bypass-switch:active {
+    transform: translateY(1px);
+}
+
+.pedal-led {
+    width: 10px;
+    height: 10px;
+    background: #333;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.pedal-led.on {
+    background: #00ff00;
+    box-shadow:
+        0 0 8px rgba(0, 255, 0, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
