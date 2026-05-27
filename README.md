@@ -20,11 +20,24 @@ Included effects:
 ### macOS (development + testing)
 
 ```sh
-brew install cmake ninja
+brew install cmake
 ```
+
+Ninja is optional — the build works with Make (the default generator).
 
 For LV2 testing install [Carla](https://kx.studio/Applications:Carla) from kx.studio or
 `brew install carla` if available. VST3 builds work in any compatible DAW.
+
+#### macOS 15 (Sequoia) Compatibility
+
+This project requires updated library versions for macOS 15 support. The submodules have been
+updated to versions compatible with both macOS 15 and the Surge project:
+
+- **JUCE**: Updated to `surge_8.0.12` branch (fixes deprecated `CGWindowListCreateImage` API)
+- **sst-basic-blocks/effects/filters**: Updated to versions matching Surge
+- **sst-waveshapers**: Added as new submodule (required by RotarySpeaker effect)
+- **simde**: Fetched automatically for ARM/Apple Silicon SIMD support
+- **fmt**: Fetched automatically (required by sst-basic-blocks)
 
 ### Linux / Raspberry Pi (aarch64, MODEP target)
 
@@ -73,9 +86,11 @@ git submodule update --init --recursive
 ### macOS (VST3 + LV2)
 
 ```sh
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+
+Or with Ninja (if installed): `cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release`
 
 Built plugins appear in `build/src/surge-fx-<name>_artefacts/`.
 

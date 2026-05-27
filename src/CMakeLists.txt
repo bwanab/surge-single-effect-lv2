@@ -45,6 +45,7 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_MODAL_LOOPS_PERMITTED=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
   )
 
   target_include_directories(${target} PRIVATE

@@ -7,7 +7,7 @@ SingleEffectProcessor::SingleEffectProcessor()
           .withInput ("Input",  juce::AudioChannelSet::stereo(), true)
           .withOutput("Output", juce::AudioChannelSet::stereo(), true))
     , gs(44100.0)
-    , effect(std::make_unique<SurgeFXType>(&bc, &gs, &es))
+    , effect(std::make_unique<SurgeFXType>(&gs, &es, nullptr))
 {
     effect->initialize();
 
@@ -28,7 +28,7 @@ SingleEffectProcessor::SingleEffectProcessor()
         );
         addParameter(p);
         fxParams[i] = p;
-        bc.paramStorage[i] = pmd.naturalToNormalized01(pmd.defaultVal);
+        effect->paramStorage[i] = pmd.naturalToNormalized01(pmd.defaultVal);
     }
 }
 
@@ -52,7 +52,7 @@ void SingleEffectProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
     for (int i = 0; i < numFxParams; ++i)
     {
         auto pmd = effect->paramAt(i);
-        bc.paramStorage[i] = pmd.naturalToNormalized01(*fxParams[i]);
+        effect->paramStorage[i] = pmd.naturalToNormalized01(*fxParams[i]);
     }
 
     const int totalSamples = buffer.getNumSamples();
