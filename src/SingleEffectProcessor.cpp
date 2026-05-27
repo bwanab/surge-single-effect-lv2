@@ -4,10 +4,9 @@
 
 SingleEffectProcessor::SingleEffectProcessor()
     : AudioProcessor(BusesProperties()
-          .withInput ("Input",  juce::AudioChannelSet::stereo(), true)
-          .withOutput("Output", juce::AudioChannelSet::stereo(), true))
-    , gs(44100.0)
-    , effect(std::make_unique<SurgeFXType>(&gs, &es, nullptr))
+                         .withInput("Input", juce::AudioChannelSet::stereo(), true)
+                         .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
+      gs(44100.0), effect(std::make_unique<SurgeFXType>(&gs, &es, nullptr))
 {
     effect->initialize();
 
@@ -19,13 +18,10 @@ SingleEffectProcessor::SingleEffectProcessor()
 
         // Use natural (display) min/max/default directly from ParamMetaData.
         // The label string drives units:unit in the LV2 TTL via the JUCE patch.
-        auto* p = new juce::AudioParameterFloat(
-            juce::ParameterID(pmd.name, 1),
-            pmd.name,
-            juce::NormalisableRange<float>(pmd.minVal, pmd.maxVal),
-            pmd.defaultVal,
-            juce::AudioParameterFloatAttributes().withLabel(pmd.unit)
-        );
+        auto *p = new juce::AudioParameterFloat(
+            juce::ParameterID(pmd.name, 1), pmd.name,
+            juce::NormalisableRange<float>(pmd.minVal, pmd.maxVal), pmd.defaultVal,
+            juce::AudioParameterFloatAttributes().withLabel(pmd.unit));
         addParameter(p);
         fxParams[i] = p;
         effect->paramStorage[i] = pmd.naturalToNormalized01(pmd.defaultVal);
@@ -38,15 +34,15 @@ void SingleEffectProcessor::prepareToPlay(double sampleRate, int /*samplesPerBlo
     effect->onSampleRateChanged();
 }
 
-bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const
 {
     auto out = layouts.getMainOutputChannelSet();
-    auto in  = layouts.getMainInputChannelSet();
+    auto in = layouts.getMainInputChannelSet();
     return out == juce::AudioChannelSet::stereo() &&
            (in == juce::AudioChannelSet::stereo() || in == juce::AudioChannelSet::mono());
 }
 
-void SingleEffectProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
     // Push current JUCE param values (natural units) into ConcreteConfig paramStorage (normalized).
     for (int i = 0; i < numFxParams; ++i)
@@ -56,10 +52,10 @@ void SingleEffectProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
     }
 
     const int totalSamples = buffer.getNumSamples();
-    const int numChannels  = buffer.getNumChannels();
+    const int numChannels = buffer.getNumChannels();
 
-    auto* L = buffer.getWritePointer(0);
-    auto* R = (numChannels > 1) ? buffer.getWritePointer(1) : nullptr;
+    auto *L = buffer.getWritePointer(0);
+    auto *R = (numChannels > 1) ? buffer.getWritePointer(1) : nullptr;
 
     // Process in fixed-size blocks of Config::blockSize (16 samples).
     float tmpL[blockSize], tmpR[blockSize];
@@ -92,7 +88,7 @@ void SingleEffectProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
     }
 }
 
-void SingleEffectProcessor::getStateInformation(juce::MemoryBlock& data)
+void SingleEffectProcessor::getStateInformation(juce::MemoryBlock &data)
 {
     juce::XmlElement xml("State");
     for (int i = 0; i < numFxParams; ++i)
@@ -100,7 +96,7 @@ void SingleEffectProcessor::getStateInformation(juce::MemoryBlock& data)
     copyXmlToBinary(xml, data);
 }
 
-void SingleEffectProcessor::setStateInformation(const void* data, int sizeInBytes)
+void SingleEffectProcessor::setStateInformation(const void *data, int sizeInBytes)
 {
     auto xml = getXmlFromBinary(data, sizeInBytes);
     if (!xml || xml->getTagName() != "State")
@@ -117,7 +113,4 @@ void SingleEffectProcessor::setStateInformation(const void* data, int sizeInByte
     }
 }
 
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new SingleEffectProcessor();
-}
+juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() { return new SingleEffectProcessor(); }
