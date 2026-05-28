@@ -5,9 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Apply units:unit patch to JUCE's LV2 TTL writer before JUCE is configured
-include(cmake/ApplyJuceUnitsPatch.cmake)
-
 add_subdirectory(libs/JUCE)
 
 # Dependencies via FetchContent

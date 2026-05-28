@@ -169,8 +169,10 @@ a `sst::basic_blocks::params::ParamMetaData` struct with `minVal`, `maxVal`, `de
 `name`, and `unit` already in display units (Hz, ms, %, dB, etc.).
 
 `SingleEffectProcessor` creates one `AudioParameterFloat(min, max, default)` per parameter
-directly from that metadata. The parameter label (unit string) is picked up by a small patch
-in JUCE's LV2 TTL writer (`patches/juce-lv2-units.patch`) to emit `units:unit` annotations
-— so MODEP shows "250 ms" instead of "0.07".
+directly from that metadata. JUCE's LV2 TTL writer does not emit `units:unit` annotations,
+so a per-effect post-build tool (`tools/patch-lv2-units.cpp`) rewrites each generated
+`dsp.ttl` to add them — so MODEP shows "250 ms" instead of "0.07".
 
-The patch is applied automatically during `cmake` configuration.
+The tool runs automatically as a CMake `POST_BUILD` step on every LV2 target. See
+`docs/juce-lv2-units-feature-request.md` for the upstream JUCE feature request that
+would remove the need for this post-processing.

@@ -63,6 +63,20 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
   if(UNIX AND NOT APPLE)
     target_link_options(${target}_LV2 PRIVATE -Wl,--exclude-libs,ALL)
   endif()
+
+  # Per-effect units patcher: post-build, rewrites dsp.ttl to add units:unit
+  # annotations (Hz, ms, %, dB) that JUCE's TTL writer omits.
+  set(patcher patch-lv2-units-${short_name})
+  add_executable(${patcher} ${CMAKE_SOURCE_DIR}/tools/patch-lv2-units.cpp)
+  target_compile_definitions(${patcher} PRIVATE SURGE_FX_IS_${define_suffix}=1)
+  target_link_libraries(${patcher} PRIVATE sst-effects sst-basic-blocks sst-filters)
+
+  set(ttl_path "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2/dsp.ttl")
+  add_custom_command(TARGET ${target}_LV2 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Patching units:unit into ${display_name} dsp.ttl"
+    COMMAND ${patcher} "${ttl_path}"
+    VERBATIM
+  )
 endfunction()
 
 # ---------------------------------------------------------------------------
