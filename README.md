@@ -164,15 +164,77 @@ Open Carla → Add Plugin → scan `build/src/`. The LV2 bundles live in
 
 ## How parameters work
 
+### DSP side
+
 `sst-effects` exposes each effect's parameters via `effect->paramAt(int i)` which returns
 a `sst::basic_blocks::params::ParamMetaData` struct with `minVal`, `maxVal`, `defaultVal`,
 `name`, and `unit` already in display units (Hz, ms, %, dB, etc.).
 
 `SingleEffectProcessor` creates one `AudioParameterFloat(min, max, default)` per parameter
-directly from that metadata. JUCE's LV2 TTL writer does not emit `units:unit` annotations,
-so a per-effect post-build tool (`tools/patch-lv2-units.cpp`) rewrites each generated
-`dsp.ttl` to add them — so MODEP shows "250 ms" instead of "0.07".
+directly from that metadata. JUCE emits the full parameter table into each plugin's
+`dsp.ttl`, including `units:unit` annotations so MODEP displays "250 ms" instead of "0.07".
 
-The tool runs automatically as a CMake `POST_BUILD` step on every LV2 target. See
-`docs/juce-lv2-units-feature-request.md` for the upstream JUCE feature request that
-would remove the need for this post-processing.
+### lv2:ControlPort vs. patch:writable — why it matters for MODEP skins
+
+LV2 has two distinct ways to expose plugin parameters, and they are **not
+interchangeable** in MODEP skins.
+
+**The old way — `lv2:ControlPort`**
+
+When LV2 was designed (circa 2007) it modeled plugins after hardware rack
+units. Every knob was a dedicated "ControlPort" wire: a named socket that
+carries exactly one float per audio block. The host enumerates them at load
+time, displays them in its UI, and writes a new float value whenever the user
+moves a knob. Simple, fast, universal. Nearly all pre-2018 LV2 plugins work
+this way.
+
+**The new way — `patch:writable` / atoms**
+
+As plugins grew more complex (MIDI instruments, sample loaders, spectral
+processors), a single float per socket was not enough. LV2 introduced "atoms":
+a typed, self-describing message format that can carry floats, ints, strings,
+arrays, MIDI events, or anything else. Instead of dozens of dedicated wires,
+plugins get one bidirectional message bus (an `atom:Sequence` port). Parameters
+are set by sending a `patch:Set` message — essentially "set parameter `<uri>`
+to value `3.5`". The parameter list is declared in the TTL via `patch:writable`
+rather than as individual ports.
+
+**Why Surge XT uses `patch:writable`**
+
+JUCE's LV2 export (introduced in the surge-synthesizer JUCE fork) implements
+the atom/patch protocol for all plugin parameters. This is the more modern,
+extensible approach — it supports arbitrary data types, rich preset recall, and
+future-proofing for features that don't fit in a single float. Every JUCE-built
+LV2 plugin works this way, including all the Surge XT effects in this repo.
+
+**Why this matters for MODEP modgui skins**
+
+MODEP's modgui skin engine has two separate knob-binding mechanisms:
+
+| Parameter type | HTML `mod-role` | binding attribute | lookup table |
+|---|---|---|---|
+| `lv2:ControlPort` | `input-control-port` | `mod-port-symbol="rate"` | `effect.ports.control.input` |
+| `patch:writable` | `input-parameter` | `mod-parameter-uri="https://…:fx_parm_0"` | `effect.parameters` |
+
+Using `input-control-port` on a Surge XT plugin makes knobs render correctly
+(they get label text from `modgui:port`) but they do nothing when dragged —
+the lookup returns nothing because the ControlPort list is empty. You must use
+`input-parameter` with the full parameter URI.
+
+The full URI for each parameter is the plugin base URI plus `:fx_parm_N`. For
+example, for Surge XT Chorus Rate:
+```
+https://surge-synth-team.org//plugins/Surge_XT_Chorus:fx_parm_0
+```
+
+Retrieve all parameter URIs for a deployed plugin with:
+
+```bash
+curl -s "http://localhost/effect/get?uri=<ENCODED_URI>" \
+  | python3 -c "import sys,json; [print(p['uri'], p.get('name','')) for p in json.load(sys.stdin)['parameters']]"
+```
+
+Because `mod-parameter-uri` requires the full URI (not just a short symbol),
+and the Mustache `{{#controls}}` loop only exposes `{{symbol}}`, **knobs must
+be written out individually** in each effect's `icon.html` rather than using
+the generic loop. See `docs/modgui-skin-howto.md` for the complete template.
