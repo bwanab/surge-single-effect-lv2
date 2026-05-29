@@ -62,21 +62,21 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
 
   if(UNIX AND NOT APPLE)
     target_link_options(${target}_LV2 PRIVATE -Wl,--exclude-libs,ALL)
+
+    # If modgui/surge-xt-<short_name>/ exists, fold it into the LV2 bundle post-build.
+    set(modgui_src "${CMAKE_SOURCE_DIR}/modgui/surge-xt-${short_name}")
+    if(EXISTS "${modgui_src}")
+      set(lv2_bundle "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2")
+      add_custom_command(TARGET ${target}_LV2 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${modgui_src}/modgui" "${lv2_bundle}/modgui"
+        COMMAND ${CMAKE_COMMAND} -E copy "${modgui_src}/modgui.ttl" "${lv2_bundle}/modgui.ttl"
+        COMMAND sed -i "s|rdfs:seeAlso <dsp.ttl>|rdfs:seeAlso <dsp.ttl> , <modgui.ttl>|"
+          "${lv2_bundle}/manifest.ttl"
+        COMMENT "Installing modgui for Surge XT ${display_name}"
+        VERBATIM
+      )
+    endif()
   endif()
-
-  # Per-effect units patcher: post-build, rewrites dsp.ttl to add units:unit
-  # annotations (Hz, ms, %, dB) that JUCE's TTL writer omits.
-  set(patcher patch-lv2-units-${short_name})
-  add_executable(${patcher} ${CMAKE_SOURCE_DIR}/tools/patch-lv2-units.cpp)
-  target_compile_definitions(${patcher} PRIVATE SURGE_FX_IS_${define_suffix}=1)
-  target_link_libraries(${patcher} PRIVATE sst-effects sst-basic-blocks sst-filters)
-
-  set(ttl_path "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2/dsp.ttl")
-  add_custom_command(TARGET ${target}_LV2 POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "Patching units:unit into ${display_name} dsp.ttl"
-    COMMAND ${patcher} "${ttl_path}"
-    VERBATIM
-  )
 endfunction()
 
 # ---------------------------------------------------------------------------
@@ -90,3 +90,25 @@ surge_add_effect(phaser   PHASER   "Phaser"         "surge-xt-phaser"   "S2PH")
 surge_add_effect(reverb1  REVERB1  "Reverb 1"       "surge-xt-reverb1"  "S2R1")
 surge_add_effect(delay    DELAY    "Delay"           "surge-xt-delay"    "S2DL")
 surge_add_effect(rotary   ROTARY   "Rotary Speaker"  "surge-xt-rotary"   "S2RT")
+
+# ---------------------------------------------------------------------------
+# Chorus: assembled from the pre-built Surge XT bundle + modgui from this repo.
+# sst-effects Chorus.h is an empty stub, so DSP comes from ../surge build.
+# ---------------------------------------------------------------------------
+if(UNIX AND NOT APPLE)
+  set(surge_chorus_src "${CMAKE_SOURCE_DIR}/../surge/build/surge_xt_products/Surge XT Chorus.lv2")
+  set(surge_chorus_dst "${CMAKE_CURRENT_BINARY_DIR}/surge-fx-chorus_artefacts/$<CONFIG>/LV2/Surge XT Chorus.lv2")
+
+  add_custom_target(surge-fx-chorus ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${surge_chorus_src}" "${surge_chorus_dst}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${CMAKE_SOURCE_DIR}/modgui/surge-xt-chorus/modgui" "${surge_chorus_dst}/modgui"
+    COMMAND ${CMAKE_COMMAND} -E copy
+      "${CMAKE_SOURCE_DIR}/modgui/surge-xt-chorus/modgui.ttl" "${surge_chorus_dst}/modgui.ttl"
+    COMMAND sed -i "s|rdfs:seeAlso <dsp.ttl>|rdfs:seeAlso <dsp.ttl> , <modgui.ttl>|"
+      "${surge_chorus_dst}/manifest.ttl"
+    COMMENT "Assembling Chorus LV2 bundle from surge build + modgui"
+    VERBATIM
+  )
+endif()
