@@ -5,10 +5,15 @@ Applies four corrections that cannot be made upstream (dsp.ttl is generated
 by JUCE from the Surge build):
 
   1. Adds lv2:ChorusPlugin so MODEP sorts it under Modulators
-  2. Sets a human-readable doap:description for the info page
+  2. Adds rdfs:comment for the info page description (MODEP reads this field,
+     not doap:description)
   3. Caps Rate (fx_parm_0) maximum at 20 Hz (upstream value: 512 Hz)
   4. Removes _unused_8 through _unused_11 from parameter declarations
      and from patch:writable / patch:readable lists
+
+Note: MODEP's info page parameter table only shows traditional lv2:ControlPort
+inputs. Surge XT uses the patch:writable atom protocol, so parameters do not
+appear in that table — this is a MODEP limitation, not something fixable here.
 """
 import sys
 import re
@@ -22,11 +27,15 @@ text = text.replace(
     '\ta lv2:Plugin , lv2:ChorusPlugin ;\n',
 )
 
-# 2. Description
+# 2. Description — MODEP reads rdfs:comment, not doap:description.
+#    Insert rdfs:comment before the existing doap:description line.
+COMMENT = (
+    'A beautiful sounding chorus pedal much like that ubiquitous blue pedal.\n\n'
+    'Credit: The Surge XT Team'
+)
 text = text.replace(
     'doap:description "Surge XT Chorus"',
-    'doap:description "A beautiful sounding chorus pedal much like that'
-    ' ubiquitous blue pedal.\\n\\nCredit: The Surge XT Team"',
+    f'rdfs:comment """{COMMENT}""" ;\n\tdoap:description "Surge XT Chorus"',
 )
 
 # 3. Rate maximum: 512 Hz -> 20 Hz (fx_parm_0 is the only param with max 512)
