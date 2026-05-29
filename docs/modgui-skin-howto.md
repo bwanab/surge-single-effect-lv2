@@ -319,7 +319,7 @@ For reference, the full chorus parameter list (from `dsp.ttl`):
 
 | Symbol      | Label    | Range              | Units |
 |-------------|----------|--------------------|-------|
-| `fx_parm_0` | Rate     | 0.0078125 – 20     | Hz    |
+| `fx_parm_0` | Rate     | 0.0078125 – 1      | Hz    |
 | `fx_parm_1` | Depth    | 0 – 100            | %     |
 | `fx_parm_2` | Time     | 0.488 – 125        | ms    |
 | `fx_parm_3` | Feedback | 0 – 100            | %     |
