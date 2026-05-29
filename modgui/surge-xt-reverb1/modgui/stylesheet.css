@@ -1,0 +1,155 @@
+@import url(/fonts/nexa/stylesheet.css);
+@import url(/fonts/questrial/stylesheet.css);
+
+.mod-pedal-boxy{{{cns}}} {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 230px 431px;
+    height: 431px;
+    position: absolute;
+    width: 230px;
+    border-radius: 21px;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-plugin-brand {
+    height: 155px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 115px;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-plugin-brand img.mod-surge-logo {
+    width: 155px;
+    height: 155px;
+    display: block;
+    margin: 0 auto;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-plugin-brand .mod-surge-brand-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    font-family: "Nexa";
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: black;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-plugin-name {
+    left: 30px;
+    overflow: hidden;
+    position: absolute;
+    right: 30px;
+    text-align: center;
+    top: 340px;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-plugin-name h1 {
+    font-family: "Questrial";
+    font-size: 21px;
+    line-height: 1;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-light {
+    background-position: center center;
+    background-repeat: no-repeat;
+    height: 32px;
+    left: 10px;
+    position: absolute;
+    right: 10px;
+    top: 235px;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-footswitch {
+    background-image: url(/resources/pedals/footswitch.png{{{ns}}});
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    background-size: auto 132px;
+    bottom: 95px;
+    left: 13px;
+    right: 13px;
+    cursor: pointer;
+    height: 66px;
+    width: 66px;
+    margin: auto;
+    position: absolute !important;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-footswitch.on {
+    background-position-y: top !important;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-control-group {
+    margin: 20px !important;
+    position: relative;
+    text-align: center;
+    z-index: 30;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-control-group .mod-knob {
+    overflow: hidden;
+    position: relative;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-control-group .mod-knob > span.mod-knob-title {
+    bottom: 0;
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    height: 12px;
+    left: 0;
+    line-height: 1;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    text-transform: uppercase;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-three-knobs .mod-control-group .mod-knob .mod-knob-image {
+    background-image: url(/resources/knobs/lata/lata.png{{{ns}}});
+    background-repeat: no-repeat;
+    background-size: auto 60px;
+    height: 60px;
+    width: 60px;
+    margin: 0 auto;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-three-knobs .mod-control-group .mod-knob {
+    display: inline-block;
+    height: 73px;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob .mod-knob-image {
+    background-image: url(/resources/knobs/lata/lata.png{{{ns}}});
+    background-repeat: no-repeat;
+    background-size: auto 46px;
+    height: 46px;
+    width: 46px;
+    margin: 0 auto;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob {
+    display: inline-block;
+    height: 59px;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-blue {
+    background-image: url(/resources/pedals/boxy/blue.png{{{ns}}});
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-blue .mod-plugin-name h1,
+.mod-pedal-boxy{{{cns}}}.mod-blue .mod-control-group .mod-knob > span.mod-knob-title {
+    color: black;
+}
+
+.mod-pedal-boxy{{{cns}}} .mod-control-group.mod-aluminium .mod-knob .mod-knob-image {
+    background-image: url(/resources/knobs/boxy/aluminium.png{{{ns}}});
+}

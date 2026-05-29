@@ -1,0 +1,41 @@
+<div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-three-knobs mod-{{color}} {{color}}">
+    <div mod-role="drag-handle" class="mod-drag-handle"></div>
+    <div class="mod-plugin-brand">
+        <img src="/resources/surge_logo.svg{{{ns}}}" class="mod-surge-logo" alt="Surge XT">
+        <span class="mod-surge-brand-text">Surge Synth Team</span>
+    </div>
+    <div class="mod-plugin-name"><h1>{{label}}</h1></div>
+    <div class="mod-light on" mod-role="bypass-light"></div>
+    <div class="mod-control-group mod-{{knob}} clearfix">
+        <div class="mod-knob">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Rotary_Speaker:fx_parm_0"></div>
+            <span class="mod-knob-title">Horn Rate</span>
+        </div>
+        <div class="mod-knob">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Rotary_Speaker:fx_parm_2"></div>
+            <span class="mod-knob-title">Tremolo</span>
+        </div>
+        <div class="mod-knob">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Rotary_Speaker:fx_parm_7"></div>
+            <span class="mod-knob-title">Mix</span>
+        </div>
+    </div>
+    <div class="mod-footswitch" mod-role="bypass"></div>
+    <div class="mod-pedal-input">
+        {{#effect.ports.audio.input}}
+        <div class="mod-input mod-input-disconnected" title="{{name}}" mod-role="input-audio-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-input-image"></div>
+        </div>
+        {{/effect.ports.audio.input}}
+    </div>
+    <div class="mod-pedal-output">
+        {{#effect.ports.audio.output}}
+        <div class="mod-output mod-output-disconnected" title="{{name}}" mod-role="output-audio-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-output-image"></div>
+        </div>
+        {{/effect.ports.audio.output}}
+    </div>
+</div>
