@@ -38,10 +38,10 @@ text = text.replace(
     f'rdfs:comment """{COMMENT}""" ;\n\tdoap:description "Surge XT Chorus"',
 )
 
-# 3. Rate maximum: 512 Hz -> 20 Hz (fx_parm_0 is the only param with max 512)
+# 3. Rate maximum: 512 Hz -> 1 Hz (fx_parm_0 is the only param with max 512)
 text = text.replace(
     '\tlv2:maximum 512 ;\n',
-    '\tlv2:maximum 20 ;\n',
+    '\tlv2:maximum 1 ;\n',
 )
 
 # 4a. Remove _unused_N parameter definition blocks
