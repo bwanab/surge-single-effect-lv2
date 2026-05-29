@@ -4,12 +4,21 @@
     <div class="mod-plugin-name"><h1>{{label}}</h1></div>
     <div class="mod-light on" mod-role="bypass-light"></div>
     <div class="mod-control-group mod-{{knob}} clearfix">
-        {{#controls}}
         <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-control-port" mod-port-symbol="{{symbol}}"></div>
-            <span class="mod-knob-title">{{name}}</span>
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synth-team.org//plugins/Surge_XT_Chorus:fx_parm_1"></div>
+            <span class="mod-knob-title">Depth</span>
         </div>
-        {{/controls}}
+        <div class="mod-knob">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synth-team.org//plugins/Surge_XT_Chorus:fx_parm_0"></div>
+            <span class="mod-knob-title">Rate</span>
+        </div>
+        <div class="mod-knob">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synth-team.org//plugins/Surge_XT_Chorus:fx_parm_7"></div>
+            <span class="mod-knob-title">Mix</span>
+        </div>
     </div>
     <div class="mod-footswitch" mod-role="bypass"></div>
     <div class="mod-pedal-input">

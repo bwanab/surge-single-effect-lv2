@@ -123,8 +123,22 @@ automatically and folds it into the bundle.
 
 ## Step 4: Write `modgui/icon.html`
 
-Use the standard boxy template. Change `mod-three-knobs` to match the number
-of `modgui:port` entries declared.
+**Critical:** Surge XT effects use `patch:writable` atom parameters, not
+traditional `lv2:ControlPort` ports. MODEP's knob binding uses different
+attributes for each:
+
+| Port type | `mod-role` | binding attribute |
+|-----------|-----------|-------------------|
+| `lv2:ControlPort` | `input-control-port` | `mod-port-symbol="rate"` |
+| `patch:writable` | `input-parameter` | `mod-parameter-uri="https://…:fx_parm_0"` |
+
+Using `input-control-port` on a patch:writable plugin makes knobs render but
+not respond to interaction. Use `input-parameter` instead.
+
+Because `mod-parameter-uri` requires the full URI (not just the symbol), and
+the `{{#controls}}` Mustache loop only provides `{{symbol}}`, **knobs must be
+hardcoded** per effect rather than using the generic loop. Get the full URIs
+from the `/effect/get?uri=…` API response (`parameters[].uri`).
 
 ```html
 <div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-three-knobs mod-{{color}} {{color}}">
@@ -133,12 +147,12 @@ of `modgui:port` entries declared.
     <div class="mod-plugin-name"><h1>{{label}}</h1></div>
     <div class="mod-light on" mod-role="bypass-light"></div>
     <div class="mod-control-group mod-{{knob}} clearfix">
-        {{#controls}}
         <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-control-port" mod-port-symbol="{{symbol}}"></div>
-            <span class="mod-knob-title">{{name}}</span>
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="PLUGIN_URI:fx_parm_N"></div>
+            <span class="mod-knob-title">Knob Label</span>
         </div>
-        {{/controls}}
+        <!-- repeat for each knob -->
     </div>
     <div class="mod-footswitch" mod-role="bypass"></div>
     <div class="mod-pedal-input">
@@ -156,6 +170,17 @@ of `modgui:port` entries declared.
         {{/effect.ports.audio.output}}
     </div>
 </div>
+```
+
+To get the exact parameter URIs after the effect is deployed:
+
+```bash
+curl -s "http://localhost/effect/get?uri=<ENCODED_URI>" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+for p in d['parameters']:
+    print(p['uri'], p.get('name',''))
+"
 ```
 
 For a different knob count replace `mod-three-knobs` with `mod-four-knobs`,
