@@ -75,6 +75,15 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
         COMMENT "Installing modgui for Surge XT ${display_name}"
         VERBATIM
       )
+      # If a patch-dsp.py exists, run it to apply per-effect corrections to dsp.ttl.
+      set(patch_script "${modgui_src}/patch-dsp.py")
+      if(EXISTS "${patch_script}")
+        add_custom_command(TARGET ${target}_LV2 POST_BUILD
+          COMMAND python3 "${patch_script}" "${lv2_bundle}/dsp.ttl"
+          COMMENT "Patching dsp.ttl for Surge XT ${display_name}"
+          VERBATIM
+        )
+      endif()
     endif()
   endif()
 endfunction()
@@ -108,6 +117,8 @@ if(UNIX AND NOT APPLE)
       "${CMAKE_SOURCE_DIR}/modgui/surge-xt-chorus/modgui.ttl" "${surge_chorus_dst}/modgui.ttl"
     COMMAND sed -i "s|rdfs:seeAlso <dsp.ttl>|rdfs:seeAlso <dsp.ttl> , <modgui.ttl>|"
       "${surge_chorus_dst}/manifest.ttl"
+    COMMAND python3 "${CMAKE_SOURCE_DIR}/modgui/surge-xt-chorus/patch-dsp.py"
+      "${surge_chorus_dst}/dsp.ttl"
     COMMENT "Assembling Chorus LV2 bundle from surge build + modgui"
     VERBATIM
   )

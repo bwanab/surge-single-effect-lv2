@@ -221,10 +221,17 @@ cmake --build build --config Release -j2
 
 ### Deploy
 
+**Do not** use `cp -r SRC DST` when the destination directory already exists —
+it nests the source inside rather than replacing it. Instead copy files
+explicitly:
+
 ```bash
-sudo cp -r "build/src/surge-fx-<name>_artefacts/Release/LV2/Surge XT <Name>.lv2" \
-    /var/modep/lv2/surge-xt-<name>.lv2
-sudo chown -R modep:modep /var/modep/lv2/surge-xt-<name>.lv2
+SRC="build/src/surge-fx-<name>_artefacts/Release/LV2/Surge XT <Name>.lv2"
+DST="/var/modep/lv2/surge-xt-<name>.lv2"
+
+sudo cp "$SRC/dsp.ttl" "$SRC/manifest.ttl" "$SRC/modgui.ttl" "$DST/"
+sudo cp -r "$SRC/modgui/." "$DST/modgui/"
+sudo chown -R modep:modep "$DST"
 sudo systemctl restart modep-mod-ui.service
 ```
 
@@ -253,6 +260,24 @@ future installs.
 
 ---
 
+## Optional: Patching dsp.ttl
+
+The build system automatically runs `modgui/surge-xt-<name>/patch-dsp.py` if
+that file exists. Use it to correct metadata that can't be changed upstream
+(JUCE generates `dsp.ttl` from plugin source code):
+
+- **Category** — add `lv2:ChorusPlugin`, `lv2:FlangerPlugin`, etc. so MODEP
+  sorts the effect into the right bucket (Modulators, Delays, …)
+- **Description** — replace the generic `doap:description` with real copy
+- **Parameter ranges** — tighten musically extreme min/max values
+- **Unused parameters** — remove `_unused_N` entries from `patch:writable`,
+  `patch:readable`, and the parameter definition blocks
+
+Copy `modgui/surge-xt-chorus/patch-dsp.py` as a starting template. The script
+receives the path to the deployed `dsp.ttl` as its first argument.
+
+---
+
 ## Chorus: Special Case
 
 The chorus DSP (`sst-effects/Chorus.h`) is an empty stub. Its DSP comes from
@@ -269,7 +294,7 @@ For reference, the full chorus parameter list (from `dsp.ttl`):
 
 | Symbol      | Label    | Range              | Units |
 |-------------|----------|--------------------|-------|
-| `fx_parm_0` | Rate     | 0.0078125 – 512    | Hz    |
+| `fx_parm_0` | Rate     | 0.0078125 – 20     | Hz    |
 | `fx_parm_1` | Depth    | 0 – 100            | %     |
 | `fx_parm_2` | Time     | 0.488 – 125        | ms    |
 | `fx_parm_3` | Feedback | 0 – 100            | %     |
