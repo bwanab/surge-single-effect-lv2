@@ -16,15 +16,17 @@ SingleEffectProcessor::SingleEffectProcessor()
     {
         auto pmd = effect->paramAt(i);
 
-        // Use natural (display) min/max/default directly from ParamMetaData.
-        // The label string drives units:unit in the LV2 TTL via the JUCE patch.
+        // Declare parameters with their natural (physical-unit) range so that
+        // JUCE's convertFrom0to1 returns natural values. paramStorage holds
+        // natural values; the DSP reads them directly (e.g. Horn Rate frate
+        // is used in powf(2, frate) and must be in -7..9, not 0..1).
         auto *p = new juce::AudioParameterFloat(
             juce::ParameterID(pmd.name, 1), pmd.name,
             juce::NormalisableRange<float>(pmd.minVal, pmd.maxVal), pmd.defaultVal,
             juce::AudioParameterFloatAttributes().withLabel(pmd.unit));
         addParameter(p);
         fxParams[i] = p;
-        effect->paramStorage[i] = pmd.naturalToNormalized01(pmd.defaultVal);
+        effect->paramStorage[i] = pmd.defaultVal;
     }
 }
 
@@ -44,11 +46,12 @@ bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout &layouts) c
 
 void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
-    // Push current JUCE param values (natural units) into ConcreteConfig paramStorage (normalized).
+    // fxParams[i] dereferences to the natural (physical-unit) value via
+    // NormalisableRange::convertFrom0to1. Write that directly into paramStorage
+    // so the DSP receives the value it expects (e.g. Horn Rate in -7..9).
     for (int i = 0; i < numFxParams; ++i)
     {
-        auto pmd = effect->paramAt(i);
-        effect->paramStorage[i] = pmd.naturalToNormalized01(*fxParams[i]);
+        effect->paramStorage[i] = *fxParams[i];
     }
 
     const int totalSamples = buffer.getNumSamples();
