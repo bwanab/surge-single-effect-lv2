@@ -57,6 +57,37 @@ static juce::String displayUnit(const PMD &p)
     return juce::String(p.unit);
 }
 
+// Surge's init_default_values() often differs from sst-effects paramAt() defaults.
+// These tables supply the correct internal (DSP-unit) defaults per effect, sourced
+// from the corresponding Surge effect's init_default_values() implementation.
+// Any index not listed falls back to paramAt().defaultVal.
+static float surgeDefaultFor(int idx, float paramAtDefault)
+{
+#if defined(SURGE_FX_IS_DELAY)
+    // DelayEffect::init_default_values() in surge/src/common/dsp/effects/DelayEffect.cpp
+    switch (idx)
+    {
+    case 0: return -2.f;   // dly_time_left  → 250 ms
+    case 1: return -2.f;   // dly_time_right → 250 ms
+    case 2: return 0.5f;   // dly_feedback   → 50 %
+    case 4: return -24.f;  // dly_lowcut     → 110 Hz
+    case 5: return 30.f;   // dly_highcut    → 2489 Hz
+    case 6: return -2.f;   // dly_mod_rate   → 0.25 Hz
+    default: break;
+    }
+#elif defined(SURGE_FX_IS_ROTARY)
+    // RotarySpeakerEffect::init_default_values() in RotarySpeakerEffect.cpp
+    switch (idx)
+    {
+    case 3: return 0.7f;   // rot_rotor_rate → 70 %
+    case 6: return 1.0f;   // rot_width      → 1 dB
+    case 7: return 1.0f;   // rot_mix        → 100 %
+    default: break;
+    }
+#endif
+    return paramAtDefault;
+}
+
 SingleEffectProcessor::SingleEffectProcessor()
     : AudioProcessor(BusesProperties()
                          .withInput("Input", juce::AudioChannelSet::stereo(), true)
@@ -74,9 +105,10 @@ SingleEffectProcessor::SingleEffectProcessor()
         // Expose parameters in user-facing (display) units so that MODEP shows
         // musically meaningful ranges (Hz, ms, %) rather than raw internal values.
         // processBlock converts back to internal units before writing paramStorage.
+        float internalDef = surgeDefaultFor(i, pmd.defaultVal);
         float dispMin = internalToDisplay(pmd, pmd.minVal);
         float dispMax = internalToDisplay(pmd, pmd.maxVal);
-        float dispDef = internalToDisplay(pmd, pmd.defaultVal);
+        float dispDef = internalToDisplay(pmd, internalDef);
 
         auto *p = new juce::AudioParameterFloat(
             juce::ParameterID(pmd.name, 1), pmd.name,
@@ -84,7 +116,7 @@ SingleEffectProcessor::SingleEffectProcessor()
             juce::AudioParameterFloatAttributes().withLabel(displayUnit(pmd)));
         addParameter(p);
         fxParams[i] = p;
-        effect->paramStorage[i] = pmd.defaultVal;
+        effect->paramStorage[i] = internalDef;
     }
 }
 
