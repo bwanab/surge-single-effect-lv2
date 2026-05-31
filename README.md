@@ -132,6 +132,29 @@ Open Carla → Add Plugin → scan `build/src/`. The LV2 bundles live in
 
 ---
 
+## Chorus: special case
+
+The `sst-effects/Chorus.h` is an empty stub — the Chorus DSP lives only in the
+full Surge codebase. The `surge-fx-chorus` CMake target in this repo copies a
+pre-built `Surge XT Chorus.lv2` from `../surge/build/surge_xt_products/` and
+overlays the modgui skin from `modgui/surge-xt-chorus/`.
+
+To build Chorus from source:
+
+```sh
+git clone https://github.com/bwanab/surge ../surge
+cd ../surge
+git checkout surge-single-fx
+git submodule update --init --recursive
+cmake -B build -DSURGE_BUILD_LV2=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target surge-single-fx-chorus
+```
+
+The resulting `../surge/build/surge_xt_products/Surge XT Chorus.lv2` is then
+picked up automatically when you build this repo.
+
+---
+
 ## Adding a new effect
 
 1. **Check availability** — see which effects are in
