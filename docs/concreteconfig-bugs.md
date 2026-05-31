@@ -1,5 +1,27 @@
 # ConcreteConfig Bugs — Analysis and Upstream Defense
 
+## Summary
+
+When the Surge XT bus effects (Flanger, Phaser, Delay, Reverb 1, Rotary Speaker)
+were run via `ConcreteConfig` in our standalone LV2 plugin, three bugs in that
+class caused the following audible failures:
+
+- **Flanger produced complete silence.** The LFO phase accumulator received NaN
+  on every block due to `pow(-2, f)` with a non-integer exponent, corrupting all
+  output samples.
+- **Delay Time knob had no audible effect.** The right-channel delay time was
+  never linked to the left, so moving the Time knob only changed the left ear
+  while the right stayed fixed at its default (0.25 s).
+- **Reverb 1 Width parameter did nothing.** The dB-to-linear conversion always
+  returned 1.0, so the width value was the same regardless of knob position.
+
+All three effects worked correctly in the Surge standalone application and in the
+existing `surge-xt-effects.lv2` bundle, both of which use `SurgeSSTFXAdapter`
+rather than `ConcreteConfig`. The bugs were latent until `ConcreteConfig` was
+first used in a real-time audio context.
+
+---
+
 ## Background
 
 `ConcreteConfig` is a self-described "WIP" convenience class in sst-effects for
