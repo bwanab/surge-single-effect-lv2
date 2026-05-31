@@ -305,11 +305,17 @@ receives the path to the deployed `dsp.ttl` as its first argument.
 
 ## Chorus: Special Case
 
-The chorus DSP (`sst-effects/Chorus.h`) is an empty stub. Its DSP comes from
-`../surge/build/surge_xt_products/Surge XT Chorus.lv2`. The CMake target
-`surge-fx-chorus` copies that pre-built bundle and then overlays the modgui
-files from `modgui/surge-xt-chorus/`. The process otherwise follows the same
-steps above.
+The chorus DSP (`sst-effects/Chorus.h`) is an empty stub. The real DSP comes
+from building the `surge-single-fx` branch of
+[bwanab/surge](https://github.com/bwanab/surge/tree/surge-single-fx), which
+produces `surge_xt_products/Surge XT Chorus.lv2` as a build artefact. The
+CMake target `surge-fx-chorus` in this repo copies that bundle from
+`../surge/build/surge_xt_products/Surge XT Chorus.lv2` and overlays the modgui
+files from `modgui/surge-xt-chorus/` (which live in this repo). The process
+otherwise follows the same steps above.
+
+See the **Chorus: special case** section in `README.md` for full build
+instructions.
 
 ---
 
