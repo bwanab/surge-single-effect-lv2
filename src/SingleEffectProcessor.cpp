@@ -16,10 +16,15 @@ using PMD = sst::basic_blocks::params::ParamMetaData;
 
 static float internalToDisplay(const PMD &p, float v)
 {
+    float result;
     switch (p.displayScale)
     {
     case PMD::A_TWO_TO_THE_B:
-        return p.svA * powf(2.f, p.svB * v + p.svC) + p.svD;
+        result = p.svA * powf(2.f, p.svB * v + p.svC) + p.svD;
+        // Envelope-time params report in seconds; convert to ms for MODEP display.
+        if (p.unit == "s")
+            result *= 1000.f;
+        return result;
     case PMD::LINEAR:
         return p.svA * v + p.svB;
     default:
@@ -32,6 +37,9 @@ static float displayToInternal(const PMD &p, float v)
     switch (p.displayScale)
     {
     case PMD::A_TWO_TO_THE_B:
+        // Undo ms→s scaling before inverting the log2 formula.
+        if (p.unit == "s")
+            v /= 1000.f;
         // invert: internal = (log2((v - svD) / svA) - svC) / svB
         return (log2f((v - p.svD) / p.svA) - p.svC) / p.svB;
     case PMD::LINEAR:
@@ -39,6 +47,14 @@ static float displayToInternal(const PMD &p, float v)
     default:
         return v;
     }
+}
+
+// Unit label for JUCE parameter: envelope-time params are exposed in ms, not s.
+static juce::String displayUnit(const PMD &p)
+{
+    if (p.displayScale == PMD::A_TWO_TO_THE_B && p.unit == "s")
+        return "ms";
+    return juce::String(p.unit);
 }
 
 SingleEffectProcessor::SingleEffectProcessor()
@@ -65,7 +81,7 @@ SingleEffectProcessor::SingleEffectProcessor()
         auto *p = new juce::AudioParameterFloat(
             juce::ParameterID(pmd.name, 1), pmd.name,
             juce::NormalisableRange<float>(dispMin, dispMax), dispDef,
-            juce::AudioParameterFloatAttributes().withLabel(pmd.unit));
+            juce::AudioParameterFloatAttributes().withLabel(displayUnit(pmd)));
         addParameter(p);
         fxParams[i] = p;
         effect->paramStorage[i] = pmd.defaultVal;
