@@ -1,6 +1,45 @@
 #include "SingleEffectProcessor.h"
 #include <algorithm>
+#include <cmath>
 #include <cstring>
+
+// ParamMetaData stores internal (DSP) values; the display scale and coefficients
+// encode how to convert to/from user-facing units (Hz, ms, %, dB, etc.).
+//
+// A_TWO_TO_THE_B:  display = svA * 2^(svB * internal + svC) + svD
+//                  (used by envelope time, LFO rate, audible frequency)
+// LINEAR:          display = svA * internal + svB
+//                  (used by percent, decibels — dB types have svA=1, svB=0 so no-op)
+// All other scales have display == internal for our purposes.
+
+using PMD = sst::basic_blocks::params::ParamMetaData;
+
+static float internalToDisplay(const PMD &p, float v)
+{
+    switch (p.displayScale)
+    {
+    case PMD::A_TWO_TO_THE_B:
+        return p.svA * powf(2.f, p.svB * v + p.svC) + p.svD;
+    case PMD::LINEAR:
+        return p.svA * v + p.svB;
+    default:
+        return v;
+    }
+}
+
+static float displayToInternal(const PMD &p, float v)
+{
+    switch (p.displayScale)
+    {
+    case PMD::A_TWO_TO_THE_B:
+        // invert: internal = (log2((v - svD) / svA) - svC) / svB
+        return (log2f((v - p.svD) / p.svA) - p.svC) / p.svB;
+    case PMD::LINEAR:
+        return (p.svA != 0.f) ? (v - p.svB) / p.svA : v;
+    default:
+        return v;
+    }
+}
 
 SingleEffectProcessor::SingleEffectProcessor()
     : AudioProcessor(BusesProperties()
@@ -16,13 +55,16 @@ SingleEffectProcessor::SingleEffectProcessor()
     {
         auto pmd = effect->paramAt(i);
 
-        // Declare parameters with their natural (physical-unit) range so that
-        // JUCE's convertFrom0to1 returns natural values. paramStorage holds
-        // natural values; the DSP reads them directly (e.g. Horn Rate frate
-        // is used in powf(2, frate) and must be in -7..9, not 0..1).
+        // Expose parameters in user-facing (display) units so that MODEP shows
+        // musically meaningful ranges (Hz, ms, %) rather than raw internal values.
+        // processBlock converts back to internal units before writing paramStorage.
+        float dispMin = internalToDisplay(pmd, pmd.minVal);
+        float dispMax = internalToDisplay(pmd, pmd.maxVal);
+        float dispDef = internalToDisplay(pmd, pmd.defaultVal);
+
         auto *p = new juce::AudioParameterFloat(
             juce::ParameterID(pmd.name, 1), pmd.name,
-            juce::NormalisableRange<float>(pmd.minVal, pmd.maxVal), pmd.defaultVal,
+            juce::NormalisableRange<float>(dispMin, dispMax), dispDef,
             juce::AudioParameterFloatAttributes().withLabel(pmd.unit));
         addParameter(p);
         fxParams[i] = p;
@@ -46,12 +88,11 @@ bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout &layouts) c
 
 void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
-    // fxParams[i] dereferences to the natural (physical-unit) value via
-    // NormalisableRange::convertFrom0to1. Write that directly into paramStorage
-    // so the DSP receives the value it expects (e.g. Horn Rate in -7..9).
+    // Convert from display units back to internal DSP units before each block.
     for (int i = 0; i < numFxParams; ++i)
     {
-        effect->paramStorage[i] = *fxParams[i];
+        auto pmd = effect->paramAt(i);
+        effect->paramStorage[i] = displayToInternal(pmd, *fxParams[i]);
     }
 
     const int totalSamples = buffer.getNumSamples();
@@ -110,8 +151,11 @@ void SingleEffectProcessor::setStateInformation(const void *data, int sizeInByte
         auto key = "p" + juce::String(i);
         if (xml->hasAttribute(key))
         {
-            float val = (float)xml->getDoubleAttribute(key, pmd.defaultVal);
-            *fxParams[i] = std::clamp(val, pmd.minVal, pmd.maxVal);
+            float dispMin = internalToDisplay(pmd, pmd.minVal);
+            float dispMax = internalToDisplay(pmd, pmd.maxVal);
+            float dispDef = internalToDisplay(pmd, pmd.defaultVal);
+            float val = (float)xml->getDoubleAttribute(key, dispDef);
+            *fxParams[i] = std::clamp(val, dispMin, dispMax);
         }
     }
 }
