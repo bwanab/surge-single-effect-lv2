@@ -201,16 +201,16 @@ after constructing the effect, matching how Surge uses the concept.
 
 | Fix | Where it belongs | Rationale |
 |-----|-----------------|-----------|
-| `envelopeRateLinear` | upstream sst-effects PR | unambiguous bug, one correct answer |
-| `dbToLinear` | upstream sst-effects PR | unambiguous stub, one correct answer |
-| `isDeactivated` | upstream sst-effects PR (with `deactivated[]` array) + plugin update | blanket `true` is a workaround; proper fix needs per-parameter state |
+| `envelopeRateLinear` | upstream sst-effects PR #251 ✓ | unambiguous bug, one correct answer |
+| `dbToLinear` | upstream sst-effects PR #251 ✓ | unambiguous stub, one correct answer |
+| `isDeactivated` | project-specific config (this repo) | blanket return is wrong; proper fix requires per-parameter state in a domain-specific config |
 
-Items 1 and 2 should be straightforward to merge. Item 3 requires a small API
-addition to `ConcreteConfig::BC` and a corresponding update in our plugin to set
-`effect->deactivated[dly_time_right_index] = true` at init time — at which point
-our blanket `return true` can be reverted.
+Items 1 and 2 are in [sst-effects PR #251](https://github.com/surge-synthesizer/sst-effects/pull/251)
+awaiting merge. The upstream maintainer confirmed these are correct fixes and
+that `ConcreteConfig` is intended only for test environments — real deployments
+use a domain-specific config implementation.
 
-Until the upstream PR lands, the current `return true` is a workable interim
-fix for our specific 3-knob pedal UI: all the parameters affected by the side
-effects (hi/lo cut filters, drive) are not exposed as user controls anyway.
-The Phaser sweep regression is the one known quality issue introduced by it.
+Item 3 is resolved locally by replacing `ConcreteConfig` with a project-specific
+config (see `src/SurgeEffectsConfig.h`) that carries a `deactivated[]` array in
+`BC` and sets `dly_time_right` as deactivated for the Delay effect, matching how
+Surge's production `SurgeSSTFXAdapter` works.
