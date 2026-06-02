@@ -111,6 +111,12 @@ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
+> **Deploying after editing a single effect:** `cmake --build build --target surge-fx-<name>`
+> only rebuilds the static shared-code library — it does **not** re-link the `.so` that
+> goes into the LV2 bundle. Always use `cmake --build build --target surge-fx-<name>_LV2`
+> (note the `_LV2` suffix) before deploying, or just run `cmake --build build` to rebuild
+> everything.
+
 ---
 
 ## Install to MODEP
