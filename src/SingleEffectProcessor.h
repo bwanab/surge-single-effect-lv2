@@ -1,30 +1,30 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
-#include <sst/effects/ConcreteConfig.h>
+#include "SurgeEffectsConfig.h"
 
 // ---------------------------------------------------------------------------
 // Compile-time effect selection via SURGE_FX_IS_<NAME>=1
 // ---------------------------------------------------------------------------
 #if defined(SURGE_FX_IS_FLANGER)
 #include <sst/effects/Flanger.h>
-using SurgeFXType = sst::effects::flanger::Flanger<sst::effects::core::ConcreteConfig>;
+using SurgeFXType = sst::effects::flanger::Flanger<SurgeEffectsConfig>;
 
 #elif defined(SURGE_FX_IS_PHASER)
 #include <sst/effects/Phaser.h>
-using SurgeFXType = sst::effects::phaser::Phaser<sst::effects::core::ConcreteConfig>;
+using SurgeFXType = sst::effects::phaser::Phaser<SurgeEffectsConfig>;
 
 #elif defined(SURGE_FX_IS_REVERB1)
 #include <sst/effects/Reverb1.h>
-using SurgeFXType = sst::effects::reverb1::Reverb1<sst::effects::core::ConcreteConfig>;
+using SurgeFXType = sst::effects::reverb1::Reverb1<SurgeEffectsConfig>;
 
 #elif defined(SURGE_FX_IS_DELAY)
 #include <sst/effects/Delay.h>
-using SurgeFXType = sst::effects::delay::Delay<sst::effects::core::ConcreteConfig>;
+using SurgeFXType = sst::effects::delay::Delay<SurgeEffectsConfig>;
 
 #elif defined(SURGE_FX_IS_ROTARY)
 #include <sst/effects/RotarySpeaker.h>
-using SurgeFXType = sst::effects::rotaryspeaker::RotarySpeaker<sst::effects::core::ConcreteConfig>;
+using SurgeFXType = sst::effects::rotaryspeaker::RotarySpeaker<SurgeEffectsConfig>;
 
 #else
 #error "No effect selected. Define SURGE_FX_IS_<NAME>=1 (FLANGER, PHASER, REVERB1, DELAY, ROTARY)"
@@ -62,9 +62,9 @@ class SingleEffectProcessor : public juce::AudioProcessor
     bool isBusesLayoutSupported(const BusesLayout &layouts) const override;
 
   private:
-    using Config = sst::effects::core::ConcreteConfig;
+    using Config = SurgeEffectsConfig;
     static constexpr int blockSize = Config::blockSize;
-    static constexpr int maxParams = Config::BC::maxParamCount;
+    static constexpr int maxParams = Config::maxParamCount;
 
     Config::GS gs;
     Config::ES es;

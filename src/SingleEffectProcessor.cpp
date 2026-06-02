@@ -94,6 +94,12 @@ SingleEffectProcessor::SingleEffectProcessor()
                          .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       gs(44100.0), effect(std::make_unique<SurgeFXType>(&gs, &es, nullptr))
 {
+#if defined(SURGE_FX_IS_DELAY)
+    // dly_time_right (index 1) deactivated so it follows dly_time_left,
+    // giving the Time knob audible effect on both channels.
+    es.deactivated[1] = true;
+#endif
+
     effect->initialize();
 
     numFxParams = SurgeFXType::numParams;
