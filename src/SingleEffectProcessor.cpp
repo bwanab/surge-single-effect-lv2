@@ -176,8 +176,11 @@ void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce:
         float timeMs = (60000.f / bpm) * ratioMultipliers[ratioIdx];
         auto timePmd = effect->paramAt(0);
         float timeInternal = displayToInternal(timePmd, timeMs);
+
         effect->paramStorage[0] = timeInternal;
         effect->paramStorage[1] = timeInternal;
+        *fxParams[0] = timeMs;
+        *fxParams[1] = timeMs;
     }
 #endif
 
