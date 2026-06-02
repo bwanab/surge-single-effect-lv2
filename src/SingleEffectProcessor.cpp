@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <limits>
 
 // ParamMetaData stores internal (DSP) values; the display scale and coefficients
 // encode how to convert to/from user-facing units (Hz, ms, %, dB, etc.).
@@ -94,12 +95,6 @@ SingleEffectProcessor::SingleEffectProcessor()
                          .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       gs(44100.0), effect(std::make_unique<SurgeFXType>(&gs, &es, nullptr))
 {
-#if defined(SURGE_FX_IS_DELAY)
-    // dly_time_right (index 1) deactivated so it follows dly_time_left,
-    // giving the Time knob audible effect on both channels.
-    es.deactivated[1] = true;
-#endif
-
     effect->initialize();
 
     numFxParams = SurgeFXType::numParams;
@@ -124,6 +119,23 @@ SingleEffectProcessor::SingleEffectProcessor()
         fxParams[i] = p;
         effect->paramStorage[i] = internalDef;
     }
+
+#if defined(SURGE_FX_IS_DELAY)
+    {
+        // "Time" is a master parameter for the GUI knob. It is not a DSP param
+        // itself; processBlock mirrors its value to both Left (index 0) and
+        // Right (index 1) whenever it changes.
+        auto pmd = effect->paramAt(0); // same range/unit as Left
+        float dispMin = internalToDisplay(pmd, pmd.minVal);
+        float dispMax = internalToDisplay(pmd, pmd.maxVal);
+        float dispDef = internalToDisplay(pmd, surgeDefaultFor(0, pmd.defaultVal));
+        masterTimeParam = new juce::AudioParameterFloat(
+            juce::ParameterID("Time", 1), "Time",
+            juce::NormalisableRange<float>(dispMin, dispMax), dispDef,
+            juce::AudioParameterFloatAttributes().withLabel(displayUnit(pmd)));
+        addParameter(masterTimeParam);
+    }
+#endif
 }
 
 void SingleEffectProcessor::prepareToPlay(double sampleRate, int /*samplesPerBlock*/)
@@ -142,6 +154,22 @@ bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout &layouts) c
 
 void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
+#if defined(SURGE_FX_IS_DELAY)
+    // When the GUI "Time" master knob changes, mirror its value to both Left
+    // and Right so the settings page stays in sync. Left and Right can still
+    // be changed independently from settings; the next GUI move resyncs both.
+    if (masterTimeParam != nullptr)
+    {
+        float master = *masterTimeParam;
+        if (master != prevMasterTime)
+        {
+            *fxParams[0] = master;
+            *fxParams[1] = master;
+            prevMasterTime = master;
+        }
+    }
+#endif
+
     // Convert from display units back to internal DSP units before each block.
     for (int i = 0; i < numFxParams; ++i)
     {
@@ -191,6 +219,8 @@ void SingleEffectProcessor::getStateInformation(juce::MemoryBlock &data)
     juce::XmlElement xml("State");
     for (int i = 0; i < numFxParams; ++i)
         xml.setAttribute("p" + juce::String(i), (double)*fxParams[i]);
+    if (masterTimeParam != nullptr)
+        xml.setAttribute("pTime", (double)*masterTimeParam);
     copyXmlToBinary(xml, data);
 }
 
@@ -211,6 +241,15 @@ void SingleEffectProcessor::setStateInformation(const void *data, int sizeInByte
             float val = (float)xml->getDoubleAttribute(key, dispDef);
             *fxParams[i] = std::clamp(val, dispMin, dispMax);
         }
+    }
+    if (masterTimeParam != nullptr && xml->hasAttribute("pTime"))
+    {
+        auto pmd = effect->paramAt(0);
+        float dispMin = internalToDisplay(pmd, pmd.minVal);
+        float dispMax = internalToDisplay(pmd, pmd.maxVal);
+        float dispDef = internalToDisplay(pmd, surgeDefaultFor(0, pmd.defaultVal));
+        float val = (float)xml->getDoubleAttribute("pTime", dispDef);
+        *masterTimeParam = std::clamp(val, dispMin, dispMax);
     }
 }
 
