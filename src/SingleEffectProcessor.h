@@ -74,12 +74,13 @@ class SingleEffectProcessor : public juce::AudioProcessor
     int numFxParams{0};
     std::array<juce::AudioParameterFloat *, maxParams> fxParams{};
 
-    // Delay: a separate "Time" master parameter drives the GUI knob.
-    // When it changes, both Left and Right are mirrored to it so they stay
-    // in sync. Left and Right can still be set independently via the settings
-    // page; the next GUI move snaps them back together.
-    juce::AudioParameterFloat *masterTimeParam{nullptr};
-    float prevMasterTime{std::numeric_limits<float>::quiet_NaN()};
+    // Delay: BPM-synced time control. bpmParam (40–160) and ratioParam (0–8,
+    // integer steps) replace the raw Time knob. processBlock computes the
+    // delay time in ms and writes it to both Left and Right paramStorage.
+    // Ratio index: 0=1/16, 1=1/16., 2=1/8, 3=1/8., 4=1/4, 5=1/4.,
+    //              6=1/2, 7=1/2., 8=1 (whole note)
+    juce::AudioParameterFloat *bpmParam{nullptr};
+    juce::AudioParameterFloat *ratioParam{nullptr};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SingleEffectProcessor)
 };

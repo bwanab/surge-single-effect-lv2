@@ -122,18 +122,18 @@ SingleEffectProcessor::SingleEffectProcessor()
 
 #if defined(SURGE_FX_IS_DELAY)
     {
-        // "Time" is a master parameter for the GUI knob. It is not a DSP param
-        // itself; processBlock mirrors its value to both Left (index 0) and
-        // Right (index 1) whenever it changes.
-        auto pmd = effect->paramAt(0); // same range/unit as Left
-        float dispMin = internalToDisplay(pmd, pmd.minVal);
-        float dispMax = internalToDisplay(pmd, pmd.maxVal);
-        float dispDef = internalToDisplay(pmd, surgeDefaultFor(0, pmd.defaultVal));
-        masterTimeParam = new juce::AudioParameterFloat(
-            juce::ParameterID("Time", 1), "Time",
-            juce::NormalisableRange<float>(dispMin, dispMax), dispDef,
-            juce::AudioParameterFloatAttributes().withLabel(displayUnit(pmd)));
-        addParameter(masterTimeParam);
+        bpmParam = new juce::AudioParameterFloat(
+            juce::ParameterID("BPM", 1), "BPM",
+            juce::NormalisableRange<float>(40.f, 160.f), 120.f,
+            juce::AudioParameterFloatAttributes().withLabel("bpm"));
+        addParameter(bpmParam);
+
+        juce::NormalisableRange<float> ratioRange(0.f, 8.f);
+        ratioRange.interval = 1.f;
+        ratioParam = new juce::AudioParameterFloat(
+            juce::ParameterID("Ratio", 1), "Ratio", ratioRange, 4.f,
+            juce::AudioParameterFloatAttributes().withLabel(""));
+        addParameter(ratioParam);
     }
 #endif
 }
@@ -154,28 +154,32 @@ bool SingleEffectProcessor::isBusesLayoutSupported(const BusesLayout &layouts) c
 
 void SingleEffectProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
 {
-#if defined(SURGE_FX_IS_DELAY)
-    // When the GUI "Time" master knob changes, mirror its value to both Left
-    // and Right so the settings page stays in sync. Left and Right can still
-    // be changed independently from settings; the next GUI move resyncs both.
-    if (masterTimeParam != nullptr)
-    {
-        float master = *masterTimeParam;
-        if (master != prevMasterTime)
-        {
-            *fxParams[0] = master;
-            *fxParams[1] = master;
-            prevMasterTime = master;
-        }
-    }
-#endif
-
     // Convert from display units back to internal DSP units before each block.
     for (int i = 0; i < numFxParams; ++i)
     {
+#if defined(SURGE_FX_IS_DELAY)
+        if (i == 0 || i == 1)
+            continue; // Left/Right time set below from BPM + Ratio
+#endif
         auto pmd = effect->paramAt(i);
         effect->paramStorage[i] = displayToInternal(pmd, *fxParams[i]);
     }
+
+#if defined(SURGE_FX_IS_DELAY)
+    if (bpmParam != nullptr && ratioParam != nullptr)
+    {
+        // quarter-note ratios: 1/16, 1/16., 1/8, 1/8., 1/4, 1/4., 1/2, 1/2., 1
+        static constexpr float ratioMultipliers[9] = {
+            0.25f, 0.375f, 0.5f, 0.75f, 1.0f, 1.5f, 2.0f, 3.0f, 4.0f};
+        float bpm = std::clamp((float)*bpmParam, 40.f, 160.f);
+        int ratioIdx = std::clamp((int)std::round((float)*ratioParam), 0, 8);
+        float timeMs = (60000.f / bpm) * ratioMultipliers[ratioIdx];
+        auto timePmd = effect->paramAt(0);
+        float timeInternal = displayToInternal(timePmd, timeMs);
+        effect->paramStorage[0] = timeInternal;
+        effect->paramStorage[1] = timeInternal;
+    }
+#endif
 
     const int totalSamples = buffer.getNumSamples();
     const int numChannels = buffer.getNumChannels();
@@ -219,8 +223,10 @@ void SingleEffectProcessor::getStateInformation(juce::MemoryBlock &data)
     juce::XmlElement xml("State");
     for (int i = 0; i < numFxParams; ++i)
         xml.setAttribute("p" + juce::String(i), (double)*fxParams[i]);
-    if (masterTimeParam != nullptr)
-        xml.setAttribute("pTime", (double)*masterTimeParam);
+    if (bpmParam != nullptr)
+        xml.setAttribute("pBPM", (double)*bpmParam);
+    if (ratioParam != nullptr)
+        xml.setAttribute("pRatio", (double)*ratioParam);
     copyXmlToBinary(xml, data);
 }
 
@@ -242,15 +248,10 @@ void SingleEffectProcessor::setStateInformation(const void *data, int sizeInByte
             *fxParams[i] = std::clamp(val, dispMin, dispMax);
         }
     }
-    if (masterTimeParam != nullptr && xml->hasAttribute("pTime"))
-    {
-        auto pmd = effect->paramAt(0);
-        float dispMin = internalToDisplay(pmd, pmd.minVal);
-        float dispMax = internalToDisplay(pmd, pmd.maxVal);
-        float dispDef = internalToDisplay(pmd, surgeDefaultFor(0, pmd.defaultVal));
-        float val = (float)xml->getDoubleAttribute("pTime", dispDef);
-        *masterTimeParam = std::clamp(val, dispMin, dispMax);
-    }
+    if (bpmParam != nullptr)
+        *bpmParam = std::clamp((float)xml->getDoubleAttribute("pBPM", 120.0), 40.f, 160.f);
+    if (ratioParam != nullptr)
+        *ratioParam = std::clamp((float)xml->getDoubleAttribute("pRatio", 4.0), 0.f, 8.f);
 }
 
 juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() { return new SingleEffectProcessor(); }

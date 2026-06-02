@@ -1,4 +1,4 @@
-<div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-three-knobs mod-{{color}} {{color}}">
+<div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-four-knobs mod-{{color}} {{color}}">
     <div mod-role="drag-handle" class="mod-drag-handle"></div>
     <div class="mod-plugin-brand">
         <img src="/resources/surge_logo.svg{{{ns}}}" class="mod-surge-logo" alt="Surge XT">
@@ -7,10 +7,17 @@
     <div class="mod-plugin-name"><h1>{{label}}</h1></div>
     <div class="mod-light on" mod-role="bypass-light"></div>
     <div class="mod-control-group mod-{{knob}} clearfix">
-        <div class="mod-knob">
+        <div class="mod-knob" id="knob-bpm">
             <div class="mod-knob-image" mod-role="input-parameter"
-                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Delay:Time"></div>
-            <span class="mod-knob-title">Time</span>
+                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Delay:BPM"></div>
+            <div class="bpm-display">120</div>
+            <span class="mod-knob-title">BPM</span>
+        </div>
+        <div class="mod-knob" id="knob-ratio">
+            <div class="mod-knob-image" mod-role="input-parameter"
+                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Delay:Ratio"></div>
+            <div class="ratio-display">1/4</div>
+            <span class="mod-knob-title">Ratio</span>
         </div>
         <div class="mod-knob">
             <div class="mod-knob-image" mod-role="input-parameter"

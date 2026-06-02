@@ -127,6 +127,35 @@
     height: 73px;
 }
 
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob .mod-knob-image {
+    background-image: url(/resources/knobs/lata/lata.png{{{ns}}});
+    background-repeat: no-repeat;
+    background-size: auto 48px;
+    height: 48px;
+    width: 48px;
+    margin: 0 auto;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob {
+    display: inline-block;
+    height: 75px;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .bpm-display,
+.mod-pedal-boxy{{{cns}}}.mod-four-knobs .ratio-display {
+    display: block;
+    font-size: 10px;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+    height: 14px;
+    line-height: 14px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 3px;
+    margin: 1px 4px;
+}
+
 .mod-pedal-boxy{{{cns}}}.mod-blue {
     background-image: url(/resources/pedals/boxy/blue.png{{{ns}}});
 }
