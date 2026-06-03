@@ -58,7 +58,7 @@ struct SurgeEffectsConfig
 
     static inline float envelopeRateLinear(GS *s, float f)
     {
-        return (float)blockSize / (float)s->sampleRate * s->twoToX.twoToThe(f);
+        return (float)blockSize / (float)s->sampleRate / s->twoToX.twoToThe(f);
     }
 
     static inline float temposyncRatio(GS *, ES *, int) { return 1.f; }

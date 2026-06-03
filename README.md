@@ -4,13 +4,13 @@ Standalone LV2 (and VST3) plugins for individual Surge XT effects, built directl
 [sst-effects](https://github.com/surge-synthesizer/sst-effects) without pulling in all of Surge.
 Designed for [MODEP](https://blokas.io/modep/) on Raspberry Pi, developed on macOS.
 
-> **Note on the sst-effects submodule:** This repo currently pins
-> [bwanab/sst-effects](https://github.com/bwanab/sst-effects) (a fork of
-> surge-synthesizer/sst-effects) because it contains three bug fixes to
-> `ConcreteConfig` that are awaiting an upstream PR. See
-> [docs/concreteconfig-bugs.md](docs/concreteconfig-bugs.md) for the full
-> analysis. Once the PR is merged, the submodule will be updated to point back
-> at the upstream repo.
+> **Note on the sst-effects submodule:** Two `ConcreteConfig` bug fixes
+> (`envelopeRateLinear` and `dbToLinear`) were upstreamed in
+> [PR #251](https://github.com/surge-synthesizer/sst-effects/pull/251) and are
+> now merged. This repo pins the upstream
+> [surge-synthesizer/sst-effects](https://github.com/surge-synthesizer/sst-effects)
+> at the commit that includes those fixes. See
+> [docs/concreteconfig-bugs.md](docs/concreteconfig-bugs.md) for the full analysis.
 
 Included effects:
 | Plugin | LV2 URI suffix |
