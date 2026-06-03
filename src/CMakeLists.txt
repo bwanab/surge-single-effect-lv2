@@ -67,6 +67,12 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
     set(lv2_bundle_juce "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2")
     set(lv2_bundle      "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/${lv2_suffix}.lv2")
 
+    # Ensure the JUCE bundle directory exists before linking (it disappears after rename on rebuild).
+    add_custom_command(TARGET ${target}_LV2 PRE_LINK
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${lv2_bundle_juce}"
+      VERBATIM
+    )
+
     # If modgui/surge-xt-<short_name>/ exists, fold it into the LV2 bundle post-build.
     set(modgui_src "${CMAKE_SOURCE_DIR}/modgui/surge-xt-${short_name}")
     if(EXISTS "${modgui_src}")
