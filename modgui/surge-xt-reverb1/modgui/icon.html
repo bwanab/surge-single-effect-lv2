@@ -1,4 +1,4 @@
-<div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-four-knobs mod-{{color}} {{color}}">
+<div class="mod-pedal mod-pedal-boxy{{{cns}}} mod-two-rows mod-{{color}} {{color}}">
     <div mod-role="drag-handle" class="mod-drag-handle"></div>
     <div class="mod-plugin-brand">
         <img src="/resources/surge_logo.svg{{{ns}}}" class="mod-surge-logo" alt="Surge XT">
@@ -7,25 +7,29 @@
     <div class="mod-plugin-name"><h1>{{label}}</h1></div>
     <div class="mod-light on" mod-role="bypass-light"></div>
     <div class="mod-control-group mod-{{knob}} clearfix">
-        <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-parameter"
-                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Mix"></div>
-            <span class="mod-knob-title">Mix</span>
+        <div class="mod-knob-row">
+            <div class="mod-knob">
+                <div class="mod-knob-image" mod-role="input-parameter"
+                     mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Mix"></div>
+                <span class="mod-knob-title">Mix</span>
+            </div>
+            <div class="mod-knob">
+                <div class="mod-knob-image" mod-role="input-parameter"
+                     mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Decay_20Time"></div>
+                <span class="mod-knob-title">Decay</span>
+            </div>
         </div>
-        <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-parameter"
-                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Decay_20Time"></div>
-            <span class="mod-knob-title">Decay</span>
-        </div>
-        <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-parameter"
-                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Size"></div>
-            <span class="mod-knob-title">Size</span>
-        </div>
-        <div class="mod-knob">
-            <div class="mod-knob-image" mod-role="input-parameter"
-                 mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Peak_20Gain"></div>
-            <span class="mod-knob-title">Peak</span>
+        <div class="mod-knob-row">
+            <div class="mod-knob">
+                <div class="mod-knob-image" mod-role="input-parameter"
+                     mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Size"></div>
+                <span class="mod-knob-title">Size</span>
+            </div>
+            <div class="mod-knob">
+                <div class="mod-knob-image" mod-role="input-parameter"
+                     mod-parameter-uri="https://surge-synthesizer.github.io//plugins/Surge_XT_Reverb_1:Peak_20Gain"></div>
+                <span class="mod-knob-title">Peak</span>
+            </div>
         </div>
     </div>
     <div class="mod-footswitch" mod-role="bypass"></div>

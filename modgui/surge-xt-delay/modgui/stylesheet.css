@@ -128,7 +128,14 @@
     height: 73px;
 }
 
-.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob .mod-knob-image {
+.mod-pedal-boxy{{{cns}}}.mod-two-rows .mod-control-group .mod-knob-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.mod-pedal-boxy{{{cns}}}.mod-two-rows .mod-control-group .mod-knob .mod-knob-image {
     background-image: url(/resources/knobs/lata/lata.png{{{ns}}});
     background-repeat: no-repeat;
     background-size: auto 48px;
@@ -137,13 +144,15 @@
     margin: 0 auto;
 }
 
-.mod-pedal-boxy{{{cns}}}.mod-four-knobs .mod-control-group .mod-knob {
-    display: inline-block;
+.mod-pedal-boxy{{{cns}}}.mod-two-rows .mod-control-group .mod-knob {
+    width: 80px;
     height: 75px;
+    position: relative;
+    text-align: center;
 }
 
-.mod-pedal-boxy{{{cns}}}.mod-four-knobs .bpm-display,
-.mod-pedal-boxy{{{cns}}}.mod-four-knobs .ratio-display {
+.mod-pedal-boxy{{{cns}}}.mod-two-rows .bpm-display,
+.mod-pedal-boxy{{{cns}}}.mod-two-rows .ratio-display {
     display: block;
     font-size: 10px;
     font-family: monospace;
