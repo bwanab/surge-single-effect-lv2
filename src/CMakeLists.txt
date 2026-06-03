@@ -63,15 +63,18 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
   if(UNIX AND NOT APPLE)
     target_link_options(${target}_LV2 PRIVATE -Wl,--exclude-libs,ALL)
 
+    # JUCE names the bundle after PRODUCT_NAME; we want lowercase-hyphenated.
+    set(lv2_bundle_juce "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2")
+    set(lv2_bundle      "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/${lv2_suffix}.lv2")
+
     # If modgui/surge-xt-<short_name>/ exists, fold it into the LV2 bundle post-build.
     set(modgui_src "${CMAKE_SOURCE_DIR}/modgui/surge-xt-${short_name}")
     if(EXISTS "${modgui_src}")
-      set(lv2_bundle "${CMAKE_CURRENT_BINARY_DIR}/${target}_artefacts/$<CONFIG>/LV2/Surge XT ${display_name}.lv2")
       add_custom_command(TARGET ${target}_LV2 POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${modgui_src}/modgui" "${lv2_bundle}/modgui"
-        COMMAND ${CMAKE_COMMAND} -E copy "${modgui_src}/modgui.ttl" "${lv2_bundle}/modgui.ttl"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${modgui_src}/modgui" "${lv2_bundle_juce}/modgui"
+        COMMAND ${CMAKE_COMMAND} -E copy "${modgui_src}/modgui.ttl" "${lv2_bundle_juce}/modgui.ttl"
         COMMAND sed -i "s|rdfs:seeAlso <dsp.ttl>|rdfs:seeAlso <dsp.ttl> , <modgui.ttl>|"
-          "${lv2_bundle}/manifest.ttl"
+          "${lv2_bundle_juce}/manifest.ttl"
         COMMENT "Installing modgui for Surge XT ${display_name}"
         VERBATIM
       )
@@ -79,12 +82,20 @@ function(surge_add_effect short_name define_suffix display_name lv2_suffix plugi
       set(patch_script "${modgui_src}/patch-dsp.py")
       if(EXISTS "${patch_script}")
         add_custom_command(TARGET ${target}_LV2 POST_BUILD
-          COMMAND python3 "${patch_script}" "${lv2_bundle}/dsp.ttl"
+          COMMAND python3 "${patch_script}" "${lv2_bundle_juce}/dsp.ttl"
           COMMENT "Patching dsp.ttl for Surge XT ${display_name}"
           VERBATIM
         )
       endif()
     endif()
+
+    # Rename to lowercase-hyphenated name (must be last post-build step).
+    add_custom_command(TARGET ${target}_LV2 POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E remove_directory "${lv2_bundle}"
+      COMMAND ${CMAKE_COMMAND} -E rename "${lv2_bundle_juce}" "${lv2_bundle}"
+      COMMENT "Renaming bundle to ${lv2_suffix}.lv2"
+      VERBATIM
+    )
   endif()
 endfunction()
 
