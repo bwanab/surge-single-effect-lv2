@@ -26,8 +26,12 @@ using SurgeFXType = sst::effects::delay::Delay<SurgeEffectsConfig>;
 #include <sst/effects/RotarySpeaker.h>
 using SurgeFXType = sst::effects::rotaryspeaker::RotarySpeaker<SurgeEffectsConfig>;
 
+#elif defined(SURGE_FX_IS_UNIVIBE)
+#include "effects/UniVibe.h"
+using SurgeFXType = sst::effects::univibe::UniVibe<SurgeEffectsConfig>;
+
 #else
-#error "No effect selected. Define SURGE_FX_IS_<NAME>=1 (FLANGER, PHASER, REVERB1, DELAY, ROTARY)"
+#error "No effect selected. Define SURGE_FX_IS_<NAME>=1 (FLANGER, PHASER, REVERB1, DELAY, ROTARY, UNIVIBE)"
 #endif
 
 // ---------------------------------------------------------------------------

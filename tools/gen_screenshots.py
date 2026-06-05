@@ -31,6 +31,7 @@ EFFECTS = [
     {'name': 'rotary',  'label': 'Surge XT Rotary Speaker', 'color': 'blue'},
     {'name': 'chorus',  'label': 'Surge XT Chorus',         'color': 'blue',
      'deploy_dir': DEPLOY_ROOT / 'Surge XT Chorus.lv2' / 'modgui'},
+    {'name': 'univibe', 'label': 'Surge XT UniVibe',        'color': 'blue'},
 ]
 
 
@@ -158,5 +159,5 @@ if __name__ == '__main__':
         if effect['name'] in names:
             generate(**effect)
 
-    subprocess.run(['sudo', 'systemctl', 'restart', 'modep-mod-ui'])
+    subprocess.run(['sudo', 'systemctl', 'restart', 'modep-mod-host', 'modep-mod-ui'])
     print('MODEP restarted.')

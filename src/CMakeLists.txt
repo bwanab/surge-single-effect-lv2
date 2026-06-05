@@ -108,6 +108,7 @@ endfunction()
 # ---------------------------------------------------------------------------
 # Effects — one line each.
 # sst-effects has: Flanger, Phaser, Reverb1, Delay, RotarySpeaker
+# Local (src/effects/): UniVibe
 # Not yet available: Ensemble (still in Surge only), Chorus (stub in sst-effects)
 # ---------------------------------------------------------------------------
 
@@ -116,6 +117,7 @@ surge_add_effect(phaser   PHASER   "Phaser"         "surge-xt-phaser"   "S2PH")
 surge_add_effect(reverb1  REVERB1  "Reverb 1"       "surge-xt-reverb1"  "S2R1")
 surge_add_effect(delay    DELAY    "Delay"           "surge-xt-delay"    "S2DL")
 surge_add_effect(rotary   ROTARY   "Rotary Speaker"  "surge-xt-rotary"   "S2RT")
+surge_add_effect(univibe  UNIVIBE  "UniVibe"         "surge-xt-univibe"  "S2UV")
 
 # ---------------------------------------------------------------------------
 # Chorus: assembled from the pre-built Surge XT bundle + modgui from this repo.
