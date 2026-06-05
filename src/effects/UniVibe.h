@@ -108,7 +108,7 @@ private:
     // asymmetric sweep characteristic of the Shin-ei circuit.
     static float opticalCurve(float phase)
     {
-        constexpr float k = 2.5f;
+        constexpr float k = 3.5f;
         float brightness = 0.5f * (1.f + std::sin(2.f * M_PI * phase));
         return (std::exp(k * brightness) - 1.f) / (std::exp(k) - 1.f);
     }
@@ -132,8 +132,8 @@ void UniVibe<FXConfig>::processBlock(float *__restrict L, float *__restrict R)
     // Pole frequency sweep range. The Shin-ei sweeps from roughly 200 Hz (lamp dark /
     // LDR high-resistance) to ~1500 Hz (lamp bright / LDR low-resistance). The depth
     // parameter scales how far up that range the sweep travels.
-    constexpr float freqMin = 200.f;
-    constexpr float freqMax = 1500.f;
+    constexpr float freqMin = 150.f;
+    constexpr float freqMax = 2000.f;
     // Stage 4 capacitor is 0.022 µF vs 0.015 µF for stages 1–3: ratio = 15/22.
     constexpr float stageRatio[4] = {1.f, 1.f, 1.f, 15.f / 22.f};
 
