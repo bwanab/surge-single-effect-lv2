@@ -1,0 +1,3 @@
+1. The newly created screenshots and thumbnails for the pedals have a text artifact that shouldn't be there. E.G. /var/modep/lv2/surge-xt-delay.lv2/modgui/screenshot.png.
+2. The screenshot and thumbnail need to be added for Surge XT Chorus.lv2.
+3. On the settings page for all the surge-xt effects, the various parameters are available like for other effects, but for all other effects, each of the parameter settings have a symbol that looks like a symbolic mixer on the lower right that when clicked brings up a menu that allows for associating the parameter with a midi CC or OSC. The surge-xt effects do not have these. I hope this isn't a manifestation of the ControlPort vs. patch:writeable issue from the README.

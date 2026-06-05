@@ -27,24 +27,39 @@ text = text.replace(
     '\ta lv2:Plugin , lv2:ChorusPlugin ;\n',
 )
 
-# 2. Description — MODEP reads rdfs:comment, not doap:description.
+# 2. Homepage → this repo (for issue tracking); author name stays "Surge Synth Team"
+text = text.replace(
+    'foaf:homepage <https://surge-synth-team.org/>',
+    'foaf:homepage <https://github.com/bwanab/surge-single-effect-lv2>',
+)
+
+# 3. Description — MODEP reads rdfs:comment, not doap:description.
 #    Insert rdfs:comment before the existing doap:description line.
+NOTE = (
+    '⚠ KNOWN LIMITATION: MIDI CC and OSC parameter binding is not available for this plugin in MODEP. '
+    'This affects all JUCE-built LV2 plugins due to a bug in MODEP\'s handling of patch:writable parameters. '
+    'Parameters are fully adjustable via the plugin GUI and Settings panel, but cannot be mapped to MIDI controllers or expression pedals. '
+    'The Settings panel parameter list will also appear empty for the same reason. '
+    'Upstream issue: https://github.com/mod-audio/mod-ui/issues/161'
+)
 COMMENT = (
+    NOTE + '\n\n'
     'A beautiful sounding chorus pedal much like that ubiquitous blue pedal.\n\n'
-    'Credit: The Surge XT Team'
+    'Features: Modelled by Surge Synth Team (https://surge-synthesizer.github.io/)\n'
+    'Maintainer: Bill Allen\n'
 )
 text = text.replace(
     'doap:description "Surge XT Chorus"',
     f'rdfs:comment """{COMMENT}""" ;\n\tdoap:description "Surge XT Chorus"',
 )
 
-# 3. Rate maximum: 512 Hz -> 1 Hz (fx_parm_0 is the only param with max 512)
+# 4. Rate maximum: 512 Hz -> 1 Hz (fx_parm_0 is the only param with max 512)
 text = text.replace(
     '\tlv2:maximum 512 ;\n',
     '\tlv2:maximum 1 ;\n',
 )
 
-# 4a. Remove _unused_N parameter definition blocks
+# 5a. Remove _unused_N parameter definition blocks
 text = re.sub(
     r'plug:fx_parm_\d+\n\ta lv2:Parameter ;\n\trdfs:label "_unused_\d+" ;'
     r'.*?\tlv2:maximum 1 \.\n\n',
@@ -53,7 +68,7 @@ text = re.sub(
     flags=re.DOTALL,
 )
 
-# 4b. Remove fx_parm_8–11 from patch:writable and patch:readable lists.
+# 5b. Remove fx_parm_8–11 from patch:writable and patch:readable lists.
 #     Both lists end with fx_parm_11 ; — change the last kept entry (fx_parm_7)
 #     from "," to ";" and drop the four trailing entries.
 text = re.sub(

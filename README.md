@@ -275,3 +275,37 @@ Because `mod-parameter-uri` requires the full URI (not just a short symbol),
 and the Mustache `{{#controls}}` loop only exposes `{{symbol}}`, **knobs must
 be written out individually** in each effect's `icon.html` rather than using
 the generic loop. See `docs/modgui-skin-howto.md` for the complete template.
+
+### MIDI CC / OSC binding is unavailable for patch:writable plugins — a showstopper
+
+The same root cause produces a second, more serious limitation: **no parameter
+on any `patch:writable` plugin can be mapped to MIDI CC or OSC in MODEP.**
+
+For a traditional `lv2:ControlPort` plugin, each parameter in the MODEP
+settings panel shows a small mixer icon in the lower-right corner. Clicking it
+opens the MIDI CC / OSC assignment menu — the standard way to control effect
+parameters live via expression pedals, foot controllers, or DAW automation.
+
+For any `patch:writable` plugin — which includes **every plugin built with
+JUCE's LV2 backend** — that icon is absent on every parameter. The parameters
+appear in the settings panel but are entirely unassignable.
+
+The reason is the same `effect.ports.control.input` emptiness described above.
+MODEP's MIDI/OSC binding UI populates its controls from that list, and for
+`patch:writable` plugins the list contains only `enabled` and `freeWheeling`
+(both marked `pprop:notOnGUI`), so it is effectively empty.
+
+The modgui `input-parameter` workaround (described above) fixes knob
+interaction in the icon, but **there is no equivalent workaround for MIDI/OSC
+binding** — that is server-side behaviour that modgui cannot influence.
+
+This affects all JUCE-based LV2 plugins without exception, because JUCE's LV2
+exporter offers no option to emit `lv2:ControlPort` ports instead. The Surge XT
+effects in this repo, and any other JUCE-built LV2 plugin deployed to MODEP,
+share this limitation until it is addressed upstream in mod-ui.
+
+The issue is tracked at
+[mod-audio/mod-ui#161](https://github.com/mod-audio/mod-ui/issues/161).
+A fix at the `effect.ports.control.input` population layer — falling back to
+`effect.parameters` for `patch:writable` plugins — would resolve both the
+knob-binding and MIDI/OSC symptoms in one change.

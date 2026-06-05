@@ -8,6 +8,7 @@ deployed MODEP bundle.
 
 import base64
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -28,6 +29,8 @@ EFFECTS = [
     {'name': 'reverb1', 'label': 'Surge XT Reverb 1',       'color': 'blue'},
     {'name': 'delay',   'label': 'Surge XT Delay',          'color': 'blue'},
     {'name': 'rotary',  'label': 'Surge XT Rotary Speaker', 'color': 'blue'},
+    {'name': 'chorus',  'label': 'Surge XT Chorus',         'color': 'blue',
+     'deploy_dir': DEPLOY_ROOT / 'Surge XT Chorus.lv2' / 'modgui'},
 ]
 
 
@@ -35,6 +38,11 @@ def b64url(path: Path) -> str:
     mime = 'image/svg+xml' if path.suffix == '.svg' else 'image/png'
     data = base64.b64encode(path.read_bytes()).decode()
     return f'data:{mime};base64,{data}'
+
+
+def strip_mustache_blocks(text: str) -> str:
+    """Remove {{#section}}...{{/section}} blocks — they have no data to render."""
+    return re.sub(r'\{\{#[^}]+\}\}.*?\{\{/[^}]+\}\}', '', text, flags=re.DOTALL)
 
 
 def substitute_mustache(text: str, cns='', ns='', color='blue', label='', knob='lata') -> str:
@@ -67,6 +75,7 @@ def build_html(name: str, label: str, color: str) -> str:
     icon_html = (modgui_dir / 'icon.html').read_text()
     css       = (modgui_dir / 'stylesheet.css').read_text()
 
+    icon_html = strip_mustache_blocks(icon_html)
     icon_html = substitute_mustache(icon_html, color=color, label=label)
     css       = substitute_mustache(css)
 
@@ -89,7 +98,7 @@ html, body {{ margin: 0; padding: 0; width: {SCREENSHOT_W}px; height: {SCREENSHO
 </html>'''
 
 
-def generate(name: str, label: str, color: str):
+def generate(name: str, label: str, color: str, deploy_dir: Path = None):
     print(f'Generating {name}...', flush=True)
 
     html     = build_html(name, label, color)
@@ -127,8 +136,9 @@ def generate(name: str, label: str, color: str):
         thumb.save(thumbnail_tmp)
 
     # Copy to source modgui (writable) and deployed bundle (needs sudo)
-    src_dir    = MODGUI_ROOT / f'surge-xt-{name}' / 'modgui'
-    deploy_dir = DEPLOY_ROOT / f'surge-xt-{name}.lv2' / 'modgui'
+    src_dir = MODGUI_ROOT / f'surge-xt-{name}' / 'modgui'
+    if deploy_dir is None:
+        deploy_dir = DEPLOY_ROOT / f'surge-xt-{name}.lv2' / 'modgui'
 
     shutil.copy(screenshot_tmp, src_dir / 'screenshot.png')
     shutil.copy(thumbnail_tmp,  src_dir / 'thumbnail.png')

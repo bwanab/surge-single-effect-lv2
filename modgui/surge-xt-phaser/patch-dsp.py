@@ -6,15 +6,17 @@ path = sys.argv[1]
 text = open(path).read()
 
 NOTE = (
-    'Note: This plugin uses LV2 patch:writable parameters (an atom-based protocol). '
-    "MODEP's controls table only shows traditional lv2:ControlPort parameters, "
-    'so it will appear empty — all parameters are accessible through the GUI and Settings panel.'
+    '⚠ KNOWN LIMITATION: MIDI CC and OSC parameter binding is not available for this plugin in MODEP. '
+    'This affects all JUCE-built LV2 plugins due to a bug in MODEP\'s handling of patch:writable parameters. '
+    'Parameters are fully adjustable via the plugin GUI and Settings panel, but cannot be mapped to MIDI controllers or expression pedals. '
+    'The Settings panel parameter list will also appear empty for the same reason. '
+    'Upstream issue: https://github.com/mod-audio/mod-ui/issues/161'
 )
 COMMENT = (
+    NOTE + '\n\n'
     'A solid phaser effect.\n\n'
     'Features: Modelled by Surge Synth Team (https://surge-synthesizer.github.io/)\n'
-    'Maintainer: Bill Allen\n\n'
-    + NOTE
+    'Maintainer: Bill Allen\n'
 )
 
 def set_param(text, name, default=None, minimum=None, maximum=None):
